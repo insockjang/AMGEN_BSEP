@@ -6,8 +6,8 @@ myModel_regression <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"),
   
   source("~/AMGEN_BSEP/R/crossValidatePredictiveModel_regression.R")
   
-  # input matrix : X
-  # response vector: Y (it might be continuous or binary factor)
+  # input matrix from Synapse: X
+  # response vector from Synapse: Y (it might be continuous or binary factor)
   dataSets<-myData(X,Y)
   
   myENet<-function(X,Y){
