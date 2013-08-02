@@ -1,5 +1,7 @@
-myREAL_regression <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
-                              nfolds = 5){
+myREAL_regression <-function(synXXX,synYYY,
+                             testXXX,
+                             model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
+                             nfolds = 5){
   
   require(predictiveModeling)
   require(synapseClient)
@@ -8,53 +10,56 @@ myREAL_regression <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"),
   
   # input matrix from Synapse: X
   # response vector from Synapse: Y (it might be continuous or binary factor)
-  dataSets<-myData(X,Y)
+  dataSets<-myData(synXXX,synYYY)
   
-  myENet<-function(X,Y,x){
+  testXXX<-loadEntity(testXXX)
+  testData<-testXXX$objects$testInputData
+  
+  myENet<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_regression.R")
     alphas =unique(createENetTuneGrid()[,1])     
     modelTrain <- myEnetModel_regression$new()
     modelTrain$customTrain(X, Y, alpha=alphas, nfolds = 5)    
-    resultsENet<-modelTrain$customPredict(y)    
+    resultsENet<-modelTrain$customPredict(testX)    
     return(resultsENet)
   }
-  myLasso<-function(X,Y){
+  myLasso<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_regression.R")    
     modelTrain <- myEnetModel_regression$new()
     modelTrain$customTrain(X, Y, alpha=1, nfolds = 5)    
-    resultsLasso<-modelTrain$customPredict(y)    
+    resultsLasso<-modelTrain$customPredict(testX)    
     return(resultsLasso)
   }
-  myRidge<-function(X,Y){
+  myRidge<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_regression.R")         
     modelTrain <- myEnetModel_regression$new()
     modelTrain$customTrain(X, Y, alpha= 10 ^-10, nfolds = 5)    
-    resultsRidge<-modelTrain$customPredict(y)    
+    resultsRidge<-modelTrain$customPredict(testX)    
     return(resultsRidge)
   }
-  myRF<-function(X,Y){
+  myRF<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myRandomForestModel_regression.R")
     modelTrain <- myRandomForestModel_regression$new()
     modelTrain(X, Y, ntree = 500)
-    resultsRF<-modelTrain$customPredict(y)
+    resultsRF<-modelTrain$customPredict(testX)
     return(resultsRF)
   }
-  mySVM<-function(X,Y){
+  mySVM<-function(X,Y,testX){
     require(pls)
     source("~/AMGEN_BSEP/R/mySvmModel_regression.R")    
     modelTrain <- mySvmModel_regression$new()
     modelTrain(X, Y)
-    resultsSVM<-modelTrain$customPredict(y)
+    resultsSVM<-modelTrain$customPredict(testX)
     return(resultsSVM)
   }
   
   model.fun <- match.arg(model.type)
   switch(model.fun, 
-         ENet = (myfun = myENet),
-         Lasso = (myfun = myLasso),
-         Ridge = (myfun = myRidge),
-         RF = (myfun = myRF),
-         SVM = (myfun = mySVM))
+         ENet = (myfun1 = myENet),
+         Lasso = (myfun1 = myLasso),
+         Ridge = (myfun1 = myRidge),
+         RF = (myfun1 = myRF),
+         SVM = (myfun1 = mySVM))
   
   
   
@@ -66,11 +71,15 @@ myREAL_regression <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"),
   filteredFeatureData  <- t(unique(t(filteredFeatureData)))
   filteredResponseData <- filteredData$responseData
   
+  
+  filteredTestData  <- t(unique(t(testData)))
+  
+  
   ## scale these data    
   filteredFeatureDataScaled <- scale(filteredFeatureData)
   filteredResponseDataScaled <- scale(filteredResponseData)  
-  
-  resultsScale<-myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
+  filteredTestDataScaled <- scale(filteredTestData)
+  resultsScale<-myfun1(filteredFeatureDataScaled,filteredResponseDataScaled,filteredTestDataScaled)
   
   return(resultsScale) 
 }

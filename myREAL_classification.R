@@ -1,4 +1,6 @@
-myREAL_classification <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
+myREAL_classification <-function(synXXX,synYYY,
+                                 testXXX,
+                                 model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
                                  thresholdMethod = c("GMM","MEAN","MEDIAN","MEAN_SD","MEDIAN_MAD","ThirtySixty"),
                                  nfolds = 5){
   
@@ -7,9 +9,11 @@ myREAL_classification <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM
   
   # input matrix from Synapse: X
   # response vector from Synapse: Y (it might be continuous or binary factor)
-  dataSets<-myData(X,Y)
+  dataSets<-myData(synXXX,synYYY)
   
-  
+  testXXX<-loadEntity(testXXX)
+  testData<-testXXX$objects$testData
+    
   myGMM<-function(Y){  
     require(mixtools)
     a<-which(!is.na(Y))
@@ -68,62 +72,61 @@ myREAL_classification <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM
     return(Y)
   }
   
-  threshold.fun <- match.arg(thresholdMethod)
+  threshold.fun <- match.arg(thresholdMethod)  
   switch(threshold.fun, 
          MEAN = (myfun = myMEAN),
          MEDIAN = (myfun = myMEDIAN),
          MEAN_SD = (myfun = myMEAN_sd1),
          MEDIAN_MAD = (myfun = myMEDIAN_mad1),
          GMM = (myfun = myGMM),
-         ThirtySixty = (myfun = myThirtySixty))
-  
+         ThirtySixty = (myfun = myThirtySixty))  
   binResponseData <- myfun(responseData)
   
-  myENet<-function(X,Y,x){
+  myENet<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
     alphas =unique(createENetTuneGrid()[,1])     
     modelTrain <- myEnetModel_classification$new()
     modelTrain$customTrain(X, Y, alpha=alphas, nfolds = 5)    
-    resultsENet<-modelTrain$customPredict(y)    
+    resultsENet<-modelTrain$customPredict(testX)    
     return(resultsENet)
   }
-  myLasso<-function(X,Y){
+  myLasso<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")    
     modelTrain <- myEnetModel_classification$new()
     modelTrain$customTrain(X, Y, alpha=1, nfolds = 5)    
-    resultsLasso<-modelTrain$customPredict(y)    
+    resultsLasso<-modelTrain$customPredict(testX)    
     return(resultsLasso)
   }
-  myRidge<-function(X,Y){
+  myRidge<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")         
     modelTrain <- myEnetModel_classification$new()
     modelTrain$customTrain(X, Y, alpha= 10 ^-10, nfolds = 5)    
-    resultsRidge<-modelTrain$customPredict(y)    
+    resultsRidge<-modelTrain$customPredict(testX)    
     return(resultsRidge)
   }
-  myRF<-function(X,Y){
+  myRF<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myRandomForestModel_classification.R")
     modelTrain <- myRandomForestModel_classification$new()
     modelTrain(X, Y, ntree = 500)
-    resultsRF<-modelTrain$customPredict(y)
+    resultsRF<-modelTrain$customPredict(testX)
     return(resultsRF)
   }
-  mySVM<-function(X,Y){
+  mySVM<-function(X,Y,testX){
     require(pls)
     source("~/AMGEN_BSEP/R/mySvmModel_classification.R")    
     modelTrain <- mySvmModel_classification$new()
     modelTrain(X, Y)
-    resultsSVM<-modelTrain$customPredict(y)
+    resultsSVM<-modelTrain$customPredict(testX)
     return(resultsSVM)
   }
   
   model.fun <- match.arg(model.type)
   switch(model.fun, 
-         ENet = (myfun = myENet),
-         Lasso = (myfun = myLasso),
-         Ridge = (myfun = myRidge),
-         RF = (myfun = myRF),
-         SVM = (myfun = mySVM))
+         ENet = (myfun1 = myENet),
+         Lasso = (myfun1 = myLasso),
+         Ridge = (myfun1 = myRidge),
+         RF = (myfun1 = myRF),
+         SVM = (myfun1 = mySVM))
   
   
   
@@ -135,11 +138,15 @@ myREAL_classification <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM
   filteredFeatureData  <- t(unique(t(filteredFeatureData)))
   filteredResponseData <- filteredData$responseData
   
+  
+  filteredTestData  <- t(unique(t(testData)))
+  
   ## scale these data    
   filteredFeatureDataScaled <- scale(filteredFeatureData)
-  filteredResponseDataScaled <- scale(filteredResponseData)  
+  filteredResponseDataScaled <- myfun(scale(filteredResponseData))
+  filteredTestDataScaled <- scale(filteredTestData)
+  resultsScale<-myfun1(filteredFeatureDataScaled,filteredResponseDataScaled,filteredTestDataScaled)
   
-  resultsScale<-myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
   
   return(resultsScale) 
 }
