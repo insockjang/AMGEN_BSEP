@@ -1,5 +1,6 @@
-myModel_regression <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
-                                  nfolds = 5){
+myModel_regression <-function(synXXX,synYYY,                              
+                              model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
+                              nfolds = 5){
   
   require(predictiveModeling)
   require(synapseClient)
@@ -8,7 +9,8 @@ myModel_regression <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"),
   
   # input matrix from Synapse: X
   # response vector from Synapse: Y (it might be continuous or binary factor)
-  dataSets<-myData(X,Y)
+  dataSets<-myData(synXXX,synYYY)
+  
   
   myENet<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_regression.R")

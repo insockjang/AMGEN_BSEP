@@ -1,6 +1,7 @@
-myModel_classification <-function(model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
-                                  nfolds = 5,
-                                  ThresholdMethod = NULL ){
+myModel_classification <-function(function(synXXX,synYYY,                                           
+                                           model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
+                                           nfolds = 5,
+                                           ThresholdMethod = NULL ){
   
   require(predictiveModeling)
   require(synapseClient)
@@ -9,7 +10,8 @@ myModel_classification <-function(model.type = c("ENet","Lasso","Ridge","RF","SV
   
   # input matrix : X
   # response vector: Y (it might be continuous or binary factor)
-  dataSets<-myData(X,Y)
+  dataSets<-myData(synXXX,synYYY)
+  
   
   myENet<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")

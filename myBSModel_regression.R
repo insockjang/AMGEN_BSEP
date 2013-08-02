@@ -1,13 +1,15 @@
-myBSModel_regression<-function(model.type = c("ENet","Lasso","Ridge"), 
-                               numBS = 100, numCore = 10){
+myBSModel_regression<-function(synXXX,synYYY,                              
+                               model.type = c("ENet","Lasso","Ridge","RF","SVM"),                                
+                               numBS = 100, 
+                               numCore = 10){
   require(predictiveModeling)
   require(synapseClient)
   source("~/AMGEN_BSEP/R/bootstrapPredictiveModel_multicore.R")
   
   # X must be input matrix
   # Y should be response vector
-  dataSets<-myData(X,Y)
-    
+  dataSets<-myData(synXXX,synYYY)
+  
   source("~/AMGEN_BSEP/R/myEnetModel_regression.R")
   
   myENet<-function(X,Y){
@@ -32,18 +34,18 @@ myBSModel_regression<-function(model.type = c("ENet","Lasso","Ridge"),
   
   
   # data preprocessing for preselecting features
-  filteredData<-filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
   
   # filtered feature and response data
-  filteredFeatureData  <- filteredData$featureData
-  filteredFeatureData  <- t(unique(t(filteredFeatureData)))
-  filteredResponseData <- filteredData$responseData
+  filteredFeatureData         <-  filteredData$featureData
+  filteredFeatureData         <-  t(unique(t(filteredFeatureData)))
+  filteredResponseData        <-  filteredData$responseData
   
   ## scale these data    
-  filteredFeatureDataScaled <- scale(filteredFeatureData)
-  filteredResponseDataScaled <- scale(filteredResponseData)  
+  filteredFeatureDataScaled   <-  scale(filteredFeatureData)
+  filteredResponseDataScaled  <-  scale(filteredResponseData)  
   
-  resultsScale<-myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
+  resultsScale                <-  myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
   
   return(resultsScale) 
 }
