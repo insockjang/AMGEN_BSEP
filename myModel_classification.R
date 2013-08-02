@@ -6,7 +6,8 @@ myModel_classification <-function(function(synXXX,synYYY,
   require(predictiveModeling)
   require(synapseClient)
   
-  source("~/AMGEN_BSEP/R/crossValidatePredictiveModel_classification.R")
+  source("~/AMGEN_BSEP/R/crossValidatePredictiveModel_multicore.R")
+  source("~/AMGEN_BSEP/R/binarization.R")
   
   # input matrix : X
   # response vector: Y (it might be continuous or binary factor)
@@ -16,28 +17,28 @@ myModel_classification <-function(function(synXXX,synYYY,
   myENet<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
     alphas =unique(createENetTuneGrid()[,1])    
-    CV<-crossValidatePredictiveModel_classification(X, Y, model = myEnetModel_classification$new(), alpha = alphas, numFolds = nfolds, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = alphas, numFolds = nfolds, thresholdMethod = ThresholdMethod)
     return(CV)
   }
   myLasso<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
-    CV<-crossValidatePredictiveModel_classification(X, Y, model = myEnetModel_classification$new(), alpha = 1, numFolds = nfolds, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = 1, numFolds = nfolds, thresholdMethod = ThresholdMethod)
     return(CV)
   }
   myRidge<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
-    CV<-crossValidatePredictiveModel_classification(X, Y, model = myEnetModel_classification$new(), alpha = 10^-10, numFolds = nfolds, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = 10^-10, numFolds = nfolds, thresholdMethod = ThresholdMethod)
     return(CV)
   }
   myRF<-function(X,Y){
     source("~/AMGEN_BSEP/R/myRandomForestModel_classification.R")
-    CV<-crossValidatePredictiveModel_classification(X, Y, model = myRandomForestModel_classification$new(), ntree = 500, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myRandomForestModel_classification$new(), ntree = 500, thresholdMethod = ThresholdMethod)
     return(CV)
   }
   mySVM<-function(X,Y){
     require(pls)
     source("~/AMGEN_BSEP/R/mySvmModel_classification.R")    
-    CV<-crossValidatePredictiveModel_classification(X, Y, model = mySvmModel_classification$new(), thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = mySvmModel_classification$new(), thresholdMethod = ThresholdMethod)
     return(CV)
   }
   
@@ -52,18 +53,18 @@ myModel_classification <-function(function(synXXX,synYYY,
   
   
   # data preprocessing for preselecting features
-  filteredData<-filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
   
   # filtered feature and response data
-  filteredFeatureData  <- filteredData$featureData
-  filteredFeatureData  <- t(unique(t(filteredFeatureData)))
-  filteredResponseData <- filteredData$responseData
+  filteredFeatureData         <-  filteredData$featureData
+  filteredFeatureData         <-  t(unique(t(filteredFeatureData)))
+  filteredResponseData        <-  filteredData$responseData
   
   ## scale these data    
-  filteredFeatureDataScaled <- scale(filteredFeatureData)
-  filteredResponseDataScaled <- scale(filteredResponseData)  
-  
-  resultsScale<-myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
+  filteredFeatureDataScaled   <-  scale(filteredFeatureData)
+  filteredResponseDataScaled  <-  scale(filteredResponseData)  
+  filteredResponseDataScaled  <-  binarization(filteredResponseDataScaled)
+  resultsScale                <-  myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
   
   return(resultsScale) 
 }

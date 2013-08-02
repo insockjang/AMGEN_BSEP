@@ -7,7 +7,7 @@ myData <- function(synXXX,synYYYY){
   
   
   ########### Input matrix as Input: ExpressionSet Class or matrix class should be used  
-  synInput    <-  loadEntity(XXX)
+  synInput    <-  loadEntity(synXXX)
   eSet   <-  synInput$objects$XXX
   
   # if original format is matrix format, then you do not need to use the pData() function, otherwise you have to use the pData function here to make it into matrix class

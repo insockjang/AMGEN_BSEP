@@ -6,7 +6,7 @@ myBSModel_classification<-function(synXXX,synYYY,
   require(predictiveModeling)
   require(synapseClient)
   source("~/AMGEN_BSEP/R/bootstrapPredictiveModel_multicore.R")
-  
+  source("~/AMGEN_BSEP/R/binarization.R")
   # X must be input matrix
   # Y should be response vector
   dataSets<-myData(synXXX,synYYY)
