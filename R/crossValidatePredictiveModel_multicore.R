@@ -1,4 +1,4 @@
-require(mutlicore)
+require(multicore)
 crossValidatePredictiveModel_multicore <- 
   function(featureData, responseData, model, numFolds = 5, ...){
     
@@ -19,7 +19,6 @@ crossValidatePredictiveModel_multicore <-
                   testObservations = responseData[foldIndices[[k]]])
       return(res)           
     }   
-    require(multicore)
     
     foldResults<-mclapply(1:numFolds, function(x)foldResult(x),mc.cores = 5)
     return(foldResults)

@@ -1,13 +1,13 @@
-myModel_classification <-function(function(synXXX,synYYY,                                           
-                                           model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
-                                           nfolds = 5,
-                                           ThresholdMethod = NULL ){
+myModel_classification <-function(synXXX,synYYY,                                           
+                                  model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
+                                  nfolds = 5,
+                                  penaltys = NULL){
   
   require(predictiveModeling)
   require(synapseClient)
   
   source("~/AMGEN_BSEP/R/crossValidatePredictiveModel_multicore.R")
-  source("~/AMGEN_BSEP/R/binarization.R")
+  
   
   # input matrix : X
   # response vector: Y (it might be continuous or binary factor)
@@ -17,28 +17,28 @@ myModel_classification <-function(function(synXXX,synYYY,
   myENet<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
     alphas =unique(createENetTuneGrid()[,1])    
-    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = alphas, numFolds = nfolds, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = alphas, numFolds = nfolds, Penalty = penaltys)
     return(CV)
   }
   myLasso<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
-    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = 1, numFolds = nfolds, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = 1, numFolds = nfolds, Penalty = penaltys)
     return(CV)
   }
   myRidge<-function(X,Y){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
-    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = 10^-10, numFolds = nfolds, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myEnetModel_classification$new(), alpha = 10^-10, numFolds = nfolds)
     return(CV)
   }
   myRF<-function(X,Y){
     source("~/AMGEN_BSEP/R/myRandomForestModel_classification.R")
-    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myRandomForestModel_classification$new(), ntree = 500, thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = myRandomForestModel_classification$new(), ntree = 500)
     return(CV)
   }
   mySVM<-function(X,Y){
     require(pls)
     source("~/AMGEN_BSEP/R/mySvmModel_classification.R")    
-    CV<-crossValidatePredictiveModel_multicore(X, Y, model = mySvmModel_classification$new(), thresholdMethod = ThresholdMethod)
+    CV<-crossValidatePredictiveModel_multicore(X, Y, model = mySvmModel_classification$new())
     return(CV)
   }
   
@@ -53,18 +53,17 @@ myModel_classification <-function(function(synXXX,synYYY,
   
   
   # data preprocessing for preselecting features
-  filteredData                <-  filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSets$featureData,dataSets$responseData[drop=FALSE])
   
   # filtered feature and response data
   filteredFeatureData         <-  filteredData$featureData
   filteredFeatureData         <-  t(unique(t(filteredFeatureData)))
-  filteredResponseData        <-  filteredData$responseData
+  filteredResponseData        <-  as.factor(filteredData$responseData)
   
-  ## scale these data    
+  ## scale these input data    
   filteredFeatureDataScaled   <-  scale(filteredFeatureData)
-  filteredResponseDataScaled  <-  scale(filteredResponseData)  
-  filteredResponseDataScaled  <-  binarization(filteredResponseDataScaled)
-  resultsScale                <-  myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
+  
+  resultsScale                <-  myfun(filteredFeatureDataScaled,filteredResponseData)
   
   return(resultsScale) 
 }

@@ -11,9 +11,18 @@ myEnetModel_regression <- setRefClass(Class = "myEnetModel_regression",
                                 return(.self$model)
                               },
                               
-                              customTrain = function(featureData, responseData, alpha = alpha, nfolds = 5,...){
+                              customTrain = function(featureData, responseData, alpha = alpha, nfolds = 5,Penalty,...){
+                                
+                                if(!is.null(Penalty)){
+                                  kk<-match(Penalty, colnames(FeatureData))
+                                  R<-rep(1,ncol(FeatureData))
+                                  R[kk]<-0
+                                }else{
+                                  R<-rep(1,ncol(FeatureData))
+                                }
+                                
                                 if(length(alpha)==1){
-                                  .self$model <- cv.glmnet(featureData,responseData, alpha = alpha, nfolds = nfolds,...) 
+                                  .self$model <- cv.glmnet(featureData,responseData, alpha = alpha, nfolds = nfolds,penalty.factor = R,...) 
                                   optParam <- c(.self$model$cvm[which.min(.self$model$cvm)],alpha,.self$model$lambda[which.min(.self$model$cvm)])
                                   names(optParam)<-c("MSE","alpha","lambdaOpt")
                                   .self$model$optParam <- optParam
@@ -22,7 +31,7 @@ myEnetModel_regression <- setRefClass(Class = "myEnetModel_regression",
                                   optParam <-c()
                                   fit <-list()
                                   for(k in 1:length(alpha)){
-                                    fit[[k]]<-cv.glmnet(featureData,responseData, alpha = alpha[k], nfolds = nfolds,...)
+                                    fit[[k]]<-cv.glmnet(featureData,responseData, alpha = alpha[k], nfolds = nfolds,penalty.factor = R,...) 
                                     optParam<-rbind(optParam,c(fit[[k]]$cvm[which.min(fit[[k]]$cvm)],alpha[k],fit[[k]]$lambda[which.min(fit[[k]]$cvm)]))
                                   }
                                   colnames(optParam) <- c("MSE","alpha","lambdaOpt")

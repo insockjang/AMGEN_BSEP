@@ -67,5 +67,5 @@ binarization<-function(response,method = c("GMM","MEAN","MEDIAN","MEAN_SD","MEDI
          GMM = (myfun = myGMM),
          ThirtySixty = (myfun = myThirtySixty))
   
-  return(myfun(responseData))
+  return(myfun(response))
 }
