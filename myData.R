@@ -1,4 +1,4 @@
-myData <- function(synXXX,synYYYY){
+myData <- function(synXXX,synYYY){
   
   require(predictiveModeling)
   require(synapseClient)

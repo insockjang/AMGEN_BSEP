@@ -6,7 +6,12 @@ source("~/AMGEN_BSEP/R/binarization.R")
 source("~/AMGEN_BSEP/myModel_classification.R")
 source("~/AMGEN_BSEP/myData.R")
 
-Penalty <- colnames(filteredFeatureDataScaled)[sample(1:ncol(filteredFeatureDataScaled), 100)]
+synXXX<-"syn2022425"
+synYYY<-"syn2022427"
+  
+dataset<-myData(synxXX,synYYY)
+
+Penalty <- colnames(dataset$featureData)[sample(1:ncol(dataset$featureData), 10)]
 
 for(model.Type in Model.type){  
   filename = paste("~/AMGEN_BSEP/TMP/newPredictiveModel_", model.Type,"_classification_",Threshold.Method,".Rdata",sep="")
