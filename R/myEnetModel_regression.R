@@ -11,7 +11,10 @@ myEnetModel_regression <- setRefClass(Class = "myEnetModel_regression",
                                 return(.self$model)
                               },
                               
-                              customTrain = function(featureData, responseData, alpha = alpha, nfolds = 5,Penalty,...){
+                              customTrain = function(featureData, responseData, alpha = alpha, nfolds = 5,Penalty = NULL,...){
+                                K<-which(!is.na(responseData))
+                                FeatureData<-featureData[K,]
+                                ResponseData<-responseData[K]
                                 
                                 if(!is.null(Penalty)){
                                   kk<-match(Penalty, colnames(FeatureData))

@@ -6,14 +6,14 @@ myREAL_regression <-function(synXXX,synYYY,
   require(predictiveModeling)
   require(synapseClient)
   
-  source("~/AMGEN_BSEP/R/crossValidatePredictiveModel_regression.R")
+  source("~/AMGEN_BSEP/R/crossValidatePredictiveModel_multicore.R")
   
   # input matrix from Synapse: X
   # response vector from Synapse: Y (it might be continuous or binary factor)
-  dataSets<-myData(synXXX,synYYY)
+  dataSet<-myData(synXXX,synYYY)
   
   testXXX<-loadEntity(testXXX)
-  testData<-testXXX$objects$testInputData
+  testData<-testXXX$objects[[1]]
   
   myENet<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_regression.R")
@@ -64,15 +64,14 @@ myREAL_regression <-function(synXXX,synYYY,
   
   
   # data preprocessing for preselecting features
-  filteredData<-filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData<-filterPredictiveModelData(dataSet$featureData,dataSet$responseData[drop=FALSE])
   
   # filtered feature and response data
   filteredFeatureData  <- filteredData$featureData
-  filteredFeatureData  <- t(unique(t(filteredFeatureData)))
   filteredResponseData <- filteredData$responseData
   
   
-  filteredTestData  <- t(unique(t(testData)))
+  filteredTestData  <- t(testData)
   
   
   ## scale these data    

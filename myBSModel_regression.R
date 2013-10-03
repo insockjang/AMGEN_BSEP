@@ -1,5 +1,5 @@
 myBSModel_regression<-function(synXXX,synYYY,                              
-                               model.type = c("ENet","Lasso","Ridge","RF","SVM"),                                
+                               model.type = c("ENet","Lasso","Ridge"),                                
                                numBS = 100, 
                                numCore = 10,
                                penaltys = NULL){
@@ -35,7 +35,7 @@ myBSModel_regression<-function(synXXX,synYYY,
   
   
   # data preprocessing for preselecting features
-  filteredData                <-  filterPredictiveModelData(dataSets$featureData,dataSets$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSets$featureData,dataSets$responseData[drop=FALSE])
   
   # filtered feature and response data
   filteredFeatureData         <-  filteredData$featureData
