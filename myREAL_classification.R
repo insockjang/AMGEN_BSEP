@@ -40,7 +40,7 @@ myREAL_classification <-function(synXXX,synYYY,
   myRF<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myRandomForestModel_classification.R")
     modelTrain <- myRandomForestModel_classification$new()
-    modelTrain(X, Y, ntree = 500)
+    modelTrain$customTrain(X, Y, ntree = 500)
     resultsRF<-modelTrain$customPredict(testX)
     return(resultsRF)
   }
@@ -48,7 +48,7 @@ myREAL_classification <-function(synXXX,synYYY,
     require(pls)
     source("~/AMGEN_BSEP/R/mySvmModel_classification.R")    
     modelTrain <- mySvmModel_classification$new()
-    modelTrain(X, Y)
+    modelTrain$customTrain(X, Y)
     resultsSVM<-modelTrain$customPredict(testX)
     return(resultsSVM)
   }

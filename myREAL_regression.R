@@ -40,7 +40,7 @@ myREAL_regression <-function(synXXX,synYYY,
   myRF<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myRandomForestModel_regression.R")
     modelTrain <- myRandomForestModel_regression$new()
-    modelTrain(X, Y, ntree = 500)
+    modelTrain$customTrain(X, Y, ntree = 500)
     resultsRF<-modelTrain$customPredict(testX)
     return(resultsRF)
   }
@@ -48,7 +48,7 @@ myREAL_regression <-function(synXXX,synYYY,
     require(pls)
     source("~/AMGEN_BSEP/R/mySvmModel_regression.R")    
     modelTrain <- mySvmModel_regression$new()
-    modelTrain(X, Y)
+    modelTrain$customTrain(X, Y)
     resultsSVM<-modelTrain$customPredict(testX)
     return(resultsSVM)
   }

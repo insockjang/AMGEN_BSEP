@@ -9,6 +9,14 @@ synYYY<-"syn2271333"
 dataset<-myData(synXXX,synYYY)
 Penalty <- colnames(dataset$featureData)[sample(1:ncol(dataset$featureData), 10)]
 
+# ENet Model
+bsResultsScale.enet <- myBSModel_regression(synXXX,synYYY,model.type = "ENet", numBS= 5, numCore = 5, penaltys= Penalty)    
+bsResultsScale.null.enet <- myBSModel_regression(synXXX,synYYY,model.type = "ENet", numBS= 5, numCore = 5, penaltys= NULL)    
 
-resultsScale <- myBSModel_regression(synXXX,synYYY, model.type = model.Type, numBS= 5, numCore = 5, penaltys= Penalty)
-resultsScale.null <- myBSModel_regression(synXXX,synYYY, model.type = model.Type, numBS= 5, numCore = 5, penaltys= NULL)
+# Lasso Model
+bsResultsScale.lasso <- myBSModel_regression(synXXX,synYYY,model.type = "Lasso", numBS= 5, numCore = 5, penaltys= Penalty)    
+bsResultsScale.null.lasso <- myBSModel_regression(synXXX,synYYY,model.type = "Lasso", numBS= 5, numCore = 5, penaltys= NULL)    
+
+# Ridge Model
+bsResultsScale.ridge <- myBSModel_regression(synXXX,synYYY,model.type = "Ridge", numBS= 5, numCore = 5)    
+

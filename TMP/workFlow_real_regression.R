@@ -10,10 +10,20 @@ testXXX<-"syn2271323"
 
 dataset<-myData(synXXX,synYYY)
 
-resultsScale <- myREAL_regression(synXXX,synYYY,testXXX,model.type = model.Type,nfolds = 5)    
+resultsScale <- myREAL_regression(synXXX,synYYY,testXXX,model.type = model.Type, nfolds = 5)    
 
-test_response<-loadEntity("syn2271345")
+resultsRealReg.enet <- myREAL_regression(synXXX,synYYY,synTest,model.type = "ENet", nfolds = 5)    
+resultsRealReg.lasso <- myREAL_regression(synXXX,synYYY,synTest,model.type = "Lasso", nfolds = 5)    
+resultsRealReg.ridge <- myREAL_regression(synXXX,synYYY,synTest,model.type = "Ridge", nfolds = 5)    
+resultsRealReg.rf <- myREAL_regression(synXXX,synYYY,synTest,model.type = "RF", nfolds = 5)    
+resultsRealReg.svm <- myREAL_regression(synXXX,synYYY,synTest,model.type = "SVM", nfolds = 5)    
+
+test_response<-loadEntity("syn2271335")
 test.response<-test_response$objects[[1]]
-
 a2<-which(is.na(test.response))
-Analysis<-Analysis_test_COR(resultsScale[-a2,1],test.response[-a2])
+
+cor(resultsRealReg.enet[-a2,1],test.response[-a2])
+cor(resultsRealReg.lasso[-a2,1],test.response[-a2])
+cor(resultsRealReg.ridge[-a2,1],test.response[-a2])
+cor(resultsRealReg.rf[-a2,1],test.response[-a2])
+cor(resultsRealReg.svm[-a2,1],test.response[-a2])
