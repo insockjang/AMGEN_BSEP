@@ -1,7 +1,7 @@
 myModel_classification <-function(synXXX,synYYY,                                           
                                   model.type = c("ENet","Lasso","Ridge","RF","SVM"), 
                                   nfolds = 5,
-                                  penaltys = NULL){
+                                  penaltys = NULL,...){
   
   require(predictiveModeling)
   require(synapseClient)

@@ -13,11 +13,6 @@ dataset<-myData(synXXX,synYYY)
 
 Penalty <- colnames(dataset$featureData)[sample(1:ncol(dataset$featureData), 10)]
 
-for(model.Type in Model.type){  
-  filename = paste("~/AMGEN_BSEP/TMP/newPredictiveModel_", model.Type,"_classification_",Threshold.Method,".Rdata",sep="")
-  if(!file.exists(filename)){        
-    resultsScale <- myModel_classification(synXXX,synYYY,model.type = model.Type, nfolds = 5,penaltys= Penalty)    
-    resultsScale.null <- myModel_classification(synXXX,synYYY,model.type = model.Type, nfolds = 5,penaltys= NULL)    
-    save(resultsScale,file = filename)        
-  }  
-}
+# ENet Model for alpha grid
+resultsScale <- myModel_classification(synXXX,synYYY,model.type = model.Type, nfolds = 5,penaltys= Penalty)    
+resultsScale.null <- myModel_classification(synXXX,synYYY,model.type = model.Type, nfolds = 5,penaltys= NULL)    

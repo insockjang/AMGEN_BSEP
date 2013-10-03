@@ -3,7 +3,7 @@ myBSModel_regression<-function(synXXX,synYYY,
                                numBS = 100, 
                                numCore = 10,
                                penaltys = NULL){
-  require(predictiveModeling)
+  require(predictiveModeling) 
   require(synapseClient)
   source("~/AMGEN_BSEP/R/bootstrapPredictiveModel_multicore.R")
   
