@@ -11,7 +11,7 @@ myEnetModel_classification <- setRefClass(Class = "myEnetModel_classification",
                                   return(.self$model)
                                 },
                                 
-                                customTrain = function(featureData, responseData, alpha = alpha, nfolds = 5, Penalty,...){
+                                customTrain = function(featureData, responseData, alpha = alpha, nfolds = 5, Penalty = NULL,...){
                                   if(!is.factor(responseData)){                              
                                     stop('Response variable should be two levels of factor')
                                   }   

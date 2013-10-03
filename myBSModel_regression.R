@@ -1,7 +1,8 @@
 myBSModel_regression<-function(synXXX,synYYY,                              
                                model.type = c("ENet","Lasso","Ridge","RF","SVM"),                                
                                numBS = 100, 
-                               numCore = 10){
+                               numCore = 10,
+                               penaltys = NULL){
   require(predictiveModeling)
   require(synapseClient)
   source("~/AMGEN_BSEP/R/bootstrapPredictiveModel_multicore.R")
@@ -14,11 +15,11 @@ myBSModel_regression<-function(synXXX,synYYY,
   
   myENet<-function(X,Y){
     alphas =unique(createENetTuneGrid()[,1])    
-    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_regression$new(), numBootstrap= numBS, alpha=alphas, core = numCore)
+    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_regression$new(), numBootstrap= numBS, alpha=alphas, core = numCore, Penalty = penaltys)
     return(BS)
   }
   myLasso<-function(X,Y){
-    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_regression$new(), numBootstrap= numBS, alpha=1, core = numCore)
+    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_regression$new(), numBootstrap= numBS, alpha=1, core = numCore,Penalty = penaltys)
     return(BS)
   }
   myRidge<-function(X,Y){
@@ -34,7 +35,7 @@ myBSModel_regression<-function(synXXX,synYYY,
   
   
   # data preprocessing for preselecting features
-  filteredData                <-  filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSets$featureData,dataSets$responseData[,kk,drop=FALSE])
   
   # filtered feature and response data
   filteredFeatureData         <-  filteredData$featureData

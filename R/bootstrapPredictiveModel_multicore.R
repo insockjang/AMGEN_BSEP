@@ -2,6 +2,7 @@ require(multicore)
 bootstrapPredictiveModel_multicore <- 
   function(featureData, responseData, model, numBootstrap = 100, core = 1,...){
     
+    set.seed(2)
     bootIndices <- createResample(featureData[,1],times = numBootstrap,list = TRUE)
     
     bootCoeff <- function(k){

@@ -2,11 +2,12 @@ myBSModel_classification<-function(synXXX,synYYY,
                                    model.type = c("ENet","Lasso","Ridge"),                                    
                                    ThresholdMethod = NULL,
                                    numBS = 100, 
-                                   numCore = 10){
+                                   numCore = 10,
+                                   penaltys = NULL,...){
   require(predictiveModeling)
   require(synapseClient)
   source("~/AMGEN_BSEP/R/bootstrapPredictiveModel_multicore.R")
-  source("~/AMGEN_BSEP/R/binarization.R")
+  
   # X must be input matrix
   # Y should be response vector
   dataSets<-myData(synXXX,synYYY)
@@ -15,15 +16,15 @@ myBSModel_classification<-function(synXXX,synYYY,
   
   myENet<-function(X,Y){
     alphas =unique(createENetTuneGrid()[,1])    
-    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_classification$new(), numBootstrap= numBS, alpha=alphas, core = numCore)
+    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_classification$new(), numBootstrap= numBS, alpha=alphas, core = numCore, Penalty = penaltys,...)
     return(BS)
   }
   myLasso<-function(X,Y){
-    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_classification$new(), numBootstrap= numBS, alpha=1, core = numCore)
+    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_classification$new(), numBootstrap= numBS, alpha=1, core = numCore, Penalty = penaltys,...)
     return(BS)
   }
   myRidge<-function(X,Y){
-    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_classification$new(), numBootstrap= numBS, alpha=10^-10, core = numCore)
+    BS<-bootstrapPredictiveModel_multicore(X,Y, model = myEnetModel_classification$new(), numBootstrap= numBS, alpha=10^-10, core = numCore,...)
     return(BS)
   }
   
@@ -34,20 +35,19 @@ myBSModel_classification<-function(synXXX,synYYY,
          Lasso = (myfun = myLasso))
   
   
+  
   # data preprocessing for preselecting features
-  filteredData<-filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSets$featureData,dataSets$responseData[drop=FALSE])
   
   # filtered feature and response data
-  filteredFeatureData         <- filteredData$featureData
-  filteredFeatureData         <- t(unique(t(filteredFeatureData)))
-  filteredResponseData        <- filteredData$responseData
+  filteredFeatureData         <-  filteredData$featureData
+  filteredFeatureData         <-  t(unique(t(filteredFeatureData)))
+  filteredResponseData        <-  as.factor(filteredData$responseData)
   
-  ## scale these data    
-  filteredFeatureDataScaled   <- scale(filteredFeatureData)
-  filteredResponseDataScaled  <- scale(filteredResponseData)  
+  ## scale these input data    
+  filteredFeatureDataScaled   <-  scale(filteredFeatureData)
   
-  filteredResponseDataScaled  <-  binarization(filteredResponseDataScaled,method = ThresholdMethod)
-  resultsScale                <-  myfun(filteredFeatureDataScaled,filteredResponseDataScaled)
+  resultsScale                <-  myfun(filteredFeatureDataScaled,filteredResponseData)
   
   return(resultsScale) 
 }
