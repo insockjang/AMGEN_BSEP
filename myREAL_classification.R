@@ -10,10 +10,10 @@ myREAL_classification <-function(synXXX,synYYY,
   
   # input matrix from Synapse: X
   # response vector from Synapse: Y (it might be continuous or binary factor)
-  dataSets<-myData(synXXX,synYYY)
+  dataSet<-myData(synXXX,synYYY)
   
   testXXX<-loadEntity(testXXX)
-  testData<-testXXX$objects$testData
+  testData<-testXXX$objects[[1]]
     
   myENet<-function(X,Y,testX){
     source("~/AMGEN_BSEP/R/myEnetModel_classification.R")
@@ -64,19 +64,18 @@ myREAL_classification <-function(synXXX,synYYY,
   
   
   # data preprocessing for preselecting features
-  filteredData                <-  filterPredictiveModelData(dataSet$featureData,dataSet$responseData[,kk,drop=FALSE])
+  filteredData                <-  filterPredictiveModelData(dataSet$featureData,dataSet$responseData[drop=FALSE])
   
   # filtered feature and response data
   filteredFeatureData         <-  filteredData$featureData
-  filteredFeatureData         <-  t(unique(t(filteredFeatureData)))
   filteredResponseData        <-  filteredData$responseData
   
   
-  filteredTestData            <-  t(unique(t(testData)))
+  filteredTestData            <-  t(testData)
   
   ## scale these data    
   filteredFeatureDataScaled   <-  scale(filteredFeatureData)
-  filteredResponseDataScaled  <-  binarization(scale(filteredResponseData))
+  filteredResponseDataScaled  <-  binarization(scale(filteredResponseData), method = thresholdMethod)
   
   filteredTestDataScaled      <-  scale(filteredTestData)
   resultsScale                <-  myfun1(filteredFeatureDataScaled,filteredResponseDataScaled,filteredTestDataScaled)

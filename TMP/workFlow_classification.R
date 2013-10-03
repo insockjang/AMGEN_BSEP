@@ -6,10 +6,10 @@ source("~/AMGEN_BSEP/R/binarization.R")
 source("~/AMGEN_BSEP/myModel_classification.R")
 source("~/AMGEN_BSEP/myData.R")
 
-synXXX<-"syn2022425"
-synYYY<-"syn2022427"
-  
-dataset<-myData(synxXX,synYYY)
+synXXX<-"syn2271321"
+synYYY<-"syn2271347"
+
+dataset<-myData(synXXX,synYYY)
 
 Penalty <- colnames(dataset$featureData)[sample(1:ncol(dataset$featureData), 10)]
 
